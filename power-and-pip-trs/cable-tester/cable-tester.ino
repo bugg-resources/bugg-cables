@@ -1,5 +1,6 @@
 #define PIN_BUZZER 12
-  
+#define PIN_BUTTON 13
+
 #define PIN_M12_IN_VIN 2
 #define PIN_M12_GND 3
 #define PIN_M12_MIC_IN_N 4
@@ -18,20 +19,20 @@
 #define MIC_IN_P 3
 #define GNDA 4
 
-void clear_all(){
-  digitalWrite(PIN_CABLE_VIN, HIGH);
-  digitalWrite(PIN_CABLE_GND, HIGH);
-  digitalWrite(PIN_CABLE_TIP, HIGH);
-  digitalWrite(PIN_CABLE_RING, HIGH);
-  digitalWrite(PIN_CABLE_SLEEVE, HIGH);
-}
-
 void set(uint8_t pin){
   digitalWrite(pin, LOW);
 }
 
 void clear(uint8_t pin){
   digitalWrite(pin, HIGH);
+}
+
+void clear_all(){
+  digitalWrite(PIN_CABLE_VIN, HIGH);
+  digitalWrite(PIN_CABLE_GND, HIGH);
+  digitalWrite(PIN_CABLE_TIP, HIGH);
+  digitalWrite(PIN_CABLE_RING, HIGH);
+  digitalWrite(PIN_CABLE_SLEEVE, HIGH);
 }
 
 uint8_t get_connections(){
@@ -111,11 +112,21 @@ void setup() {
   pinMode(PIN_CABLE_SLEEVE, OUTPUT);
   
   pinMode(PIN_BUZZER, OUTPUT);
+  pinMode(PIN_BUTTON, INPUT_PULLUP);
+}
 
-  tone(PIN_BUZZER, 1000, 200);
-
+void loop() {
+  while (digitalRead(PIN_BUTTON) == HIGH)
+  {
+    delay(100); // wait for button press
+  }
+  while (digitalRead(PIN_BUTTON) == LOW)
+  {
+    delay(100); // wait for button release
+  }
+ 
   clear_all();
-  
+
   if (check_connections() == 0){
     Serial.println("Cable is OK");
     tone(PIN_BUZZER, 2000, 200);
@@ -124,9 +135,4 @@ void setup() {
     Serial.println("Cable is DEFECTIVE");
     tone(PIN_BUZZER, 100, 2000);
   }
-  
-}
-
-void loop() {
-
 }
